@@ -1,5 +1,40 @@
 # Docker image for inbound Jenkins agents
 
+## **Modified Fork**
+
+This is a fork of https://github.com/kevit/docker-inbound-agent which is a fork of the original inbound agent.  Kevit's
+fork contains a necessary bugfix so that one can pass the secret and name as positional parameters into Windows-based containers 
+so as to align with the Linux-based containers.  This is necessary so the [Jenkins Amazon ECS plugin](https://plugins.jenkins.io/amazon-ecs/) can properly start Windows-based
+Jenkins agents.
+
+### Additional Build Tools
+
+This fork also contains additional build tools (AWS CLI, MSBuild, Docker, Docker Compose, etc) so that Windows-based Galeo applications
+can be compiled, tested, containerized.  An improvement of this approach would be to generate the Kevit Docker image and then
+use it as a starting point in another project which adds the necessary tools.  
+
+### Building/Deploying This Custom Fork
+
+From a PowerShell window, navigate too root of this repository.
+    
+    .\make.ps1
+
+Once images are created, you want to authenticate against the Galeo Group's AWS Root account and upload the `windowsservercore-1809` tag.  
+The Jenkins build environment will automatically utilize the new image.
+
+1. Retrieve an authentication token and authenticate your Docker client to your registry.
+    ```
+    aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 465728785746.dkr.ecr.us-east-1.amazonaws.com
+   ```
+2. Tag the image.
+    ```
+    docker tag jenkins/inbound-agent:windowsservercore-1809 465728785746.dkr.ecr.us-east-1.amazonaws.com/jenkins-inbound-agent:windowsservercore-1809
+    ```
+3. Push the image into the `jenkins-inbound-agent` repository in AWS ECR.
+    ```
+    docker push 465728785746.dkr.ecr.us-east-1.amazonaws.com/jenkins-inbound-agent:windowsservercore-1809
+    ```
+
 [![Join the chat at https://gitter.im/jenkinsci/docker](https://badges.gitter.im/jenkinsci/docker.svg)](https://gitter.im/jenkinsci/docker?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![GitHub stars](https://img.shields.io/github/stars/jenkinsci/docker-inbound-agent?label=GitHub%20stars)](https://github.com/jenkinsci/docker-inbound-agent)
 [![Docker Pulls](https://img.shields.io/docker/pulls/jenkins/inbound-agent.svg)](https://hub.docker.com/r/jenkins/inbound-agent/)
