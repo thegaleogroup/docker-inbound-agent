@@ -15,7 +15,7 @@ use it as a starting point in another project which adds the necessary tools.
 
 ### Building/Deploying This Custom Fork
 
-From a PowerShell window, navigate too root of this repository.
+From a PowerShell window, navigate to the root directory of this repository.  Execute the following to build.
     
     .\make.ps1
 
