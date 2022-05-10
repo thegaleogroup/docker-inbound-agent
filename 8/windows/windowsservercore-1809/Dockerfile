@@ -38,7 +38,7 @@ RUN $output = net users ; `
 
 ####### Update PATH #######
 # Env variable with the extra bits for the path
-ENV ADD_PATH=";C:\docker-cli;C:\nuget;C:\MSBuildTools\MSBuild\Current\Bin"
+ENV ADD_PATH=";C:\docker-cli;C:\nuget;C:\node;C:\ruby\bin;C:\MSBuildTools\MSBuild\Current\Bin"
 # Change the path value directly in the registry key by appending the contents to the env variable to the contents of the path
 RUN Set-ItemProperty -Path 'Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment' -Name PATH -Value ((Get-ItemProperty -Path 'Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment' -Name PATH).path + "$Env:ADD_PATH")
 # Verify the path is correct
@@ -46,7 +46,7 @@ RUN (Get-ItemProperty -Path 'Registry::HKEY_LOCAL_MACHINE\System\CurrentControlS
 
 ####### AWS CLI Install #######
 ADD https://awscli.amazonaws.com/AWSCLIV2.msi C:/aws-temp/AWSCLIV2.msi
-RUN Start-Process "C:/aws-temp/AWSCLIV2.msi" "/qn" -PassThru | Wait-Process
+RUN Start-Process -FilePath "C:/aws-temp/AWSCLIV2.msi" -ArgumentList "/qn" -PassThru -Wait | Wait-Process
 RUN rd -r "C:/aws-temp"
 
 ####### Docker Install #######
@@ -64,6 +64,17 @@ ADD https://github.com/docker/compose/releases/download/1.29.2/docker-compose-Wi
 ###### NuGet Install #######
 # Install NuGet CLI
 ADD https://dist.nuget.org/win-x86-commandline/v5.9.1/nuget.exe C:/nuget/nuget.exe
+
+###### Node Install #######
+ADD https://nodejs.org/dist/v16.15.0/node-v16.15.0-win-x64.zip C:/node-temp/node-v16.15.0-win-x64.zip
+RUN Expand-Archive -Path 'C:/node-temp/node-v16.15.0-win-x64.zip' -DestinationPath 'C:/node-temp'
+RUN move "C:/node-temp/node-v16.15.0-win-x64" "C:/node"
+RUN rd -r "C:/node-temp"
+
+####### Ruby Install #######
+ADD https://github.com/oneclick/rubyinstaller2/releases/download/RubyInstaller-3.1.2-1/rubyinstaller-devkit-3.1.2-1-x64.exe C:/ruby-temp/rubyinstaller-devkit-3.1.2-1-x64.exe
+RUN Start-Process -FilePath "C:/ruby-temp/rubyinstaller-devkit-3.1.2-1-x64.exe" -ArgumentList "/silent","/dir=""C:/ruby""","/tasks=nomodpath" -PassThru -NoNewWindow -Wait | Wait-Process
+RUN rd -r "C:/ruby-temp"
 
 ###### MSBuild Install #######
 
@@ -84,6 +95,13 @@ RUN C:\msbuild-temp\vs_buildtools.exe --quiet --wait --norestart --nocache `
  || IF "%ERRORLEVEL%"=="3010" EXIT 0
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'Continue'; $verbosePreference='Continue';"]
 RUN rd -r "C:/msbuild-temp"
+
+# Custom cache invalidation
+ARG CACHEBUST=1
+
+####### Compass Install #######
+RUN Start-Process -FilePath "C:/ruby/bin/gem.cmd" -ArgumentList "update","--system" -PassThru -NoNewWindow -Wait | Wait-Process
+RUN Start-Process -FilePath "C:/ruby/bin/gem.cmd" -ArgumentList "install","compass" -PassThru -NoNewWindow -Wait | Wait-Process
 
 COPY jenkins-agent.ps1 C:/ProgramData/Jenkins
 USER ${user}

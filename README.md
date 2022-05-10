@@ -22,9 +22,9 @@ From a PowerShell window, navigate to the root directory of this repository.  Ex
 Once images are created, you want to authenticate against the Galeo Group's AWS Root account and upload the `windowsservercore-1809` tag.  
 The Jenkins build environment will automatically utilize the new image.
 
-1. Retrieve an authentication token and authenticate your Docker client to your registry.
+1. Retrieve an authentication token and authenticate your Docker client to your registry.  It is assumed AWS credentials are organized by profile.
     ```
-    aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 465728785746.dkr.ecr.us-east-1.amazonaws.com
+    aws ecr get-login-password --region us-east-1 --profile root | docker login --username AWS --password-stdin 465728785746.dkr.ecr.us-east-1.amazonaws.com
    ```
 2. Tag the image.
     ```
