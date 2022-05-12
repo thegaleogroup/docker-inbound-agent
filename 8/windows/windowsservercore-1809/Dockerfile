@@ -102,6 +102,7 @@ ARG CACHEBUST=1
 ####### Compass Install #######
 RUN Start-Process -FilePath "C:/ruby/bin/gem.cmd" -ArgumentList "update","--system" -PassThru -NoNewWindow -Wait | Wait-Process
 RUN Start-Process -FilePath "C:/ruby/bin/gem.cmd" -ArgumentList "install","compass" -PassThru -NoNewWindow -Wait | Wait-Process
+RUN Start-Process -FilePath "C:/ruby/bin/gem.cmd" -ArgumentList "install","bootstrap-sass" -PassThru -NoNewWindow -Wait | Wait-Process
 
 COPY jenkins-agent.ps1 C:/ProgramData/Jenkins
 USER ${user}
