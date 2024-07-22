@@ -51,15 +51,14 @@ RUN rd -r "C:/aws-temp"
 
 ####### Docker Install #######
 # Download and extract docker CLI
-ADD https://dockermsft.azureedge.net/dockercontainer/docker-20-10-0.zip C:/docker-temp/docker-binaries.zip
+ADD https://download.docker.com/win/static/stable/x86_64/docker-25.0.3.zip C:/docker-temp/docker-binaries.zip
 RUN Expand-Archive -Path 'C:/docker-temp/docker-binaries.zip' -DestinationPath 'C:/docker-temp'
 RUN mkdir "C:/docker-cli"
 RUN move "C:/docker-temp/docker/docker.exe" "C:/docker-cli/"
-RUN move "C:/docker-temp/docker/*.dll" "C:/docker-cli/"
 RUN rd -r "C:/docker-temp"
 
 ####### Docker Compose Install #######
-ADD https://github.com/docker/compose/releases/download/1.29.2/docker-compose-Windows-x86_64.exe C:/docker-cli/docker-compose.exe
+ADD https://github.com/docker/compose/releases/download/v2.29.0/docker-compose-windows-x86_64.exe C:/docker-cli/docker-compose.exe
 
 ###### NuGet Install #######
 # Install NuGet CLI
